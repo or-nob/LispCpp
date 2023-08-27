@@ -19,8 +19,8 @@ set(SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Env.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Eval.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Eval.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Procedure.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Types.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Types.cpp
     )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
