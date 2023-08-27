@@ -1,1 +1,0 @@
-/usr/local/opt/llvm@12/bin/clang++  -fsanitize=leak -fno-omit-frame-pointer  -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/lisp.dir/main.cpp.o CMakeFiles/lisp.dir/Tokenizer.cpp.o CMakeFiles/lisp.dir/Env.cpp.o CMakeFiles/lisp.dir/Eval.cpp.o -o lisp 
