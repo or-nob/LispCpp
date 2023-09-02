@@ -99,26 +99,23 @@ Number Number::abs(const Number& o) {
                                                      : static_cast<float>(fabs(s)))};
 }
 
-Exp::Exp(const Exp::ExpType& v, std::uint8_t t) : _v(v), _t(t) {}
+Exp::Exp(const Exp::ExpType& v) : _v(v) {}
 
 Exp::Exp(const std::vector<std::string>& params, const Exp& body) {
-    _v = {._l = {std::function<Exp(std::vector<Exp>, Env)>{
-              [this, params, body](std::vector<Exp> expList, Env env) -> Exp {
-                  Env e{params, expList, env};
-                  return Eval::eval(body, e);
-              }}}};
-    _t = 1;
+    _v = ExpList{Procedure{[this, params, body](std::vector<Exp> expList, Env env) -> Exp {
+        Env e{params, expList, env};
+        return Eval::eval(body, e);
+    }}};
 }
 
 Exp& Exp::operator=(const Exp& o) {
     _v = o._v;
-    _t = o._t;
     return *this;
 }
 
 void Exp::print(Exp e) {
-    if (e._t == 0) {
-        Atom a = e._v._a;
+    if (std::holds_alternative<Atom>(e._v)) {
+        Atom a = std::get<Atom>(e._v);
         if (std::holds_alternative<std::string>(a._v)) {
             std::cout << std::get<std::string>(a._v) << '\n';
         } else {
@@ -128,7 +125,8 @@ void Exp::print(Exp e) {
                       << '\n';
         }
     } else {
-        for (auto& exp : e._v._l) {
+        const ExpList& expL = std::get<ExpList>(e._v);
+        for (auto& exp : expL) {
             try {
                 print(std::any_cast<Exp>(exp));
             } catch (std::bad_any_cast exp) {

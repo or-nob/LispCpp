@@ -36,14 +36,15 @@ Exp Tokenizer::readFromTokensRec(std::queue<std::string>& tokens) {
 
     if (t == "(") {
         Exp e;
-        e._t = 1;
-        while (tokens.front() != ")") e._v._l.emplace_back(readFromTokensRec(tokens));
+        e._v = Exp::ExpList{};
+        while (tokens.front() != ")")
+            std::get<Exp::ExpList>(e._v).emplace_back(readFromTokensRec(tokens));
         tokens.pop();
         return e;
     } else if (t == ")") {
         return {};
     } else {
-        return Exp{Exp::ExpType{._a = getAtom(t)}, 0};
+        return Exp{Exp::ExpType{getAtom(t)}};
     }
 }
 

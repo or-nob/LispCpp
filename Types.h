@@ -38,15 +38,12 @@ struct Atom {
 };
 
 struct Exp {
-    typedef struct {
-        Atom _a;
-        std::vector<std::any> _l;
-    } ExpType;
-    ExpType _v;
-    std::uint8_t _t;
+    using ExpList = std::vector<std::any>;
+    using ExpType = std::variant<Atom, ExpList>;
 
+    ExpType _v;
     Exp() = default;
-    Exp(const ExpType& v, std::uint8_t t);
+    Exp(const ExpType& v);
     Exp(const std::vector<std::string>& params, const Exp& body);
 
     Exp& operator=(const Exp& o);
