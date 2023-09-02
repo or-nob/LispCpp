@@ -23,7 +23,8 @@ Exp Eval::eval(Exp e, Env& env) {
                 Exp conseq = std::any_cast<Exp>(e._v._l[2]);
                 Exp alter = std::any_cast<Exp>(e._v._l[3]);
 
-                return eval(test, env)._v._a._v._n._v._i ? eval(conseq, env) : eval(alter, env);
+                return std::get<int>(eval(test, env)._v._a._v._n._v) ? eval(conseq, env)
+                                                                     : eval(alter, env);
             } else if (fSym == "set!") {
                 std::string sym = std::any_cast<Exp>(e._v._l[1])._v._a._v._s;
                 env.find(sym)[sym] = eval(std::any_cast<Exp>(e._v._l[2]), env);

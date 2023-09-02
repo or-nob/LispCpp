@@ -24,122 +24,79 @@ Number& Number::operator/=(const Number& o) {
 }
 
 Number Number::operator+(const Number& o) {
-    Number n;
-    n._t = (_t == 0 && o._t == 0) ? 0 : 1;
+    bool isInt = std::holds_alternative<int>(_v);
+    bool isOtherInt = std::holds_alternative<int>(o._v);
 
-    float f = (_t == 0) ? _v._i : _v._f;
-    float s = (o._t == 0) ? o._v._i : o._v._f;
+    float f = isInt ? std::get<int>(_v) : std::get<float>(_v);
+    float s = isOtherInt ? std::get<int>(o._v) : std::get<float>(o._v);
 
-    if (n._t == 0)
-        n._v._i = f + s;
-    else
-        n._v._f = f + s;
-
-    return n;
+    return {._v = (isInt && isOtherInt ? static_cast<int>(f + s) : static_cast<float>(f + s))};
 }
 
 Number Number::operator-(const Number& o) {
-    Number n;
-    n._t = (_t == 0 && o._t == 0) ? 0 : 1;
-    float f = (_t == 0) ? _v._i : _v._f;
-    float s = (o._t == 0) ? o._v._i : o._v._f;
+    bool isInt = std::holds_alternative<int>(_v);
+    bool isOtherInt = std::holds_alternative<int>(o._v);
 
-    if (n._t == 0)
-        n._v._i = f - s;
-    else
-        n._v._f = f - s;
+    float f = isInt ? std::get<int>(_v) : std::get<float>(_v);
+    float s = isOtherInt ? std::get<int>(o._v) : std::get<float>(o._v);
 
-    return n;
+    return {._v = (isInt && isOtherInt ? static_cast<int>(f - s) : static_cast<float>(f - s))};
 }
 
 Number Number::operator*(const Number& o) {
-    Number n;
-    n._t = (_t == 0 && o._t == 0) ? 0 : 1;
-    float f = (_t == 0) ? _v._i : _v._f;
-    float s = (o._t == 0) ? o._v._i : o._v._f;
+    bool isInt = std::holds_alternative<int>(_v);
+    bool isOtherInt = std::holds_alternative<int>(o._v);
 
-    if (n._t == 0)
-        n._v._i = f * s;
-    else
-        n._v._f = f * s;
+    float f = isInt ? std::get<int>(_v) : std::get<float>(_v);
+    float s = isOtherInt ? std::get<int>(o._v) : std::get<float>(o._v);
 
-    return n;
+    return {._v = (isInt && isOtherInt ? static_cast<int>(f * s) : static_cast<float>(f * s))};
 }
 
 Number Number::operator/(const Number& o) {
-    Number n;
-    n._t = (_t == 0 && o._t == 0) ? 0 : 1;
+    bool isInt = std::holds_alternative<int>(_v);
+    bool isOtherInt = std::holds_alternative<int>(o._v);
 
-    float f = (_t == 0) ? _v._i : _v._f;
-    float s = (o._t == 0) ? o._v._i : o._v._f;
+    float f = isInt ? std::get<int>(_v) : std::get<float>(_v);
+    float s = isOtherInt ? std::get<int>(o._v) : std::get<float>(o._v);
 
-    if (n._t == 0)
-        n._v._i = f / s;
-    else
-        n._v._f = f / s;
-
-    return n;
+    return {._v = (isInt && isOtherInt ? static_cast<int>(f / s) : static_cast<float>(f / s))};
 }
 
 Number Number::operator>(const Number& o) {
-    Number n;
-    n._t = 0;
-
-    float f = (_t == 0) ? _v._i : _v._f;
-    float s = (o._t == 0) ? o._v._i : o._v._f;
-
-    n._v._i = f > s;
-    return n;
+    float f = std::holds_alternative<int>(_v) ? std::get<int>(_v) : std::get<float>(_v);
+    float s = std::holds_alternative<int>(o._v) ? std::get<int>(o._v) : std::get<float>(o._v);
+    return {._v = f > s};
 }
 
 Number Number::operator>=(const Number& o) {
-    Number n;
-    n._t = 0;
-
-    float f = (_t == 0) ? _v._i : _v._f;
-    float s = (o._t == 0) ? o._v._i : o._v._f;
-
-    n._v._i = f >= s;
-    return n;
+    float f = std::holds_alternative<int>(_v) ? std::get<int>(_v) : std::get<float>(_v);
+    float s = std::holds_alternative<int>(o._v) ? std::get<int>(o._v) : std::get<float>(o._v);
+    return {._v = f >= s};
 }
 
 Number Number::operator<(const Number& o) {
-    Number n;
-    n._t = 0;
-
-    float f = (_t == 0) ? _v._i : _v._f;
-    float s = (o._t == 0) ? o._v._i : o._v._f;
-
-    n._v._i = f < s;
-    return n;
+    float f = std::holds_alternative<int>(_v) ? std::get<int>(_v) : std::get<float>(_v);
+    float s = std::holds_alternative<int>(o._v) ? std::get<int>(o._v) : std::get<float>(o._v);
+    return {._v = f < s};
 }
 
 Number Number::operator<=(const Number& o) {
-    Number n;
-    n._t = 0;
-
-    float f = (_t == 0) ? _v._i : _v._f;
-    float s = (o._t == 0) ? o._v._i : o._v._f;
-
-    n._v._i = f <= s;
-    return n;
+    float f = std::holds_alternative<int>(_v) ? std::get<int>(_v) : std::get<float>(_v);
+    float s = std::holds_alternative<int>(o._v) ? std::get<int>(o._v) : std::get<float>(o._v);
+    return {._v = f <= s};
 }
 
 Number Number::operator==(const Number& o) {
-    Number n;
-    n._t = 0;
-    n._v._i = _t == o._t && _v._i == o._v._i && _v._f == o._v._f;
-    return n;
+    float f = std::holds_alternative<int>(_v) ? std::get<int>(_v) : std::get<float>(_v);
+    float s = std::holds_alternative<int>(o._v) ? std::get<int>(o._v) : std::get<float>(o._v);
+    return {._v = f == s};
 }
 
 Number Number::abs(const Number& o) {
-    Number n;
-    n._t = o._t;
-    if (o._t == 0)
-        n._v._i = fabs(o._v._i);
-    else
-        n._v._f = fabs(o._v._f);
-    return n;
+    float s = std::holds_alternative<int>(o._v) ? std::get<int>(o._v) : std::get<float>(o._v);
+    return {._v = (std::holds_alternative<int>(o._v) ? static_cast<int>(fabs(s))
+                                                     : static_cast<float>(fabs(s)))};
 }
 
 Exp::Exp(const Exp::ExpType& v, std::uint8_t t) : _v(v), _t(t) {}
@@ -166,7 +123,9 @@ void Exp::print(Exp e) {
             std::cout << a._v._s << '\n';
         } else {
             Number n = a._v._n;
-            std::cout << (n._t == 0 ? n._v._i : n._v._f) << '\n';
+            std::cout << (std::holds_alternative<int>(n._v) ? std::get<int>(n._v)
+                                                            : std::get<float>(n._v))
+                      << '\n';
         }
     } else {
         for (auto& exp : e._v._l) {

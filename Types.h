@@ -4,18 +4,14 @@
 #include <cmath>
 #include <cstdint>
 #include <iostream>
+#include <variant>
 #include <vector>
 
 class Env;
 
 struct Number {
-    typedef struct {
-        int _i;
-        float _f;
-    } NumberType;
-
+    using NumberType = std::variant<int, float>;
     NumberType _v;
-    std::uint8_t _t;
 
     Number& operator+=(const Number& o);
     Number& operator-=(const Number& o);
@@ -41,6 +37,7 @@ struct Atom {
         std::string _s;
         Number _n;
     } AtomType;
+
     AtomType _v;
     std::uint8_t _t;
 };
