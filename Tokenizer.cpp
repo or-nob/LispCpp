@@ -52,11 +52,9 @@ Atom Tokenizer::getAtom(const std::string& t) {
     try {
         int i = std::stoi(t);
         float f = std::stof(t);
-        ret._v._n._v = i == f ? i : f;
-        ret._t = 1;
+        ret._v = Number{._v = (i == f ? i : f)};
     } catch (...) {
-        ret._v._s = t;
-        ret._t = 0;
+        std::get<std::string>(ret._v) = t;
     }
 
     return ret;

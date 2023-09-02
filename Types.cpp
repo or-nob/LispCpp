@@ -119,10 +119,10 @@ Exp& Exp::operator=(const Exp& o) {
 void Exp::print(Exp e) {
     if (e._t == 0) {
         Atom a = e._v._a;
-        if (a._t == 0) {
-            std::cout << a._v._s << '\n';
+        if (std::holds_alternative<std::string>(a._v)) {
+            std::cout << std::get<std::string>(a._v) << '\n';
         } else {
-            Number n = a._v._n;
+            Number n = std::get<Number>(a._v);
             std::cout << (std::holds_alternative<int>(n._v) ? std::get<int>(n._v)
                                                             : std::get<float>(n._v))
                       << '\n';

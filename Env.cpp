@@ -38,18 +38,19 @@ void Env::init() {
     Procedure add = [](std::vector<Exp> expList, Env) -> Exp {
         Exp ret;
         ret._t = 0;
-        ret._v._a._t = 1;
 
-        Number sum = expList[0]._v._a._v._n;
+        if (!std::holds_alternative<Number>(expList[0]._v._a._v)) return Exp{};
+
+        Number sum = std::get<Number>(expList[0]._v._a._v);
 
         std::for_each(expList.begin() + 1, expList.end(), [&sum](const auto& e) {
             if (e._t != 0) return;
             Atom a = e._v._a;
-            if (a._t == 0) return;
-            sum += a._v._n;
+            if (!std::holds_alternative<Number>(a._v)) return;
+            sum += std::get<Number>(a._v);
         });
 
-        ret._v._a._v._n = sum;
+        ret._v._a._v = sum;
 
         return ret;
     };
@@ -63,18 +64,19 @@ void Env::init() {
         {._l = {Procedure{[](std::vector<Exp> expList, Env) -> Exp {
              Exp ret;
              ret._t = 0;
-             ret._v._a._t = 1;
 
-             Number sub = expList[0]._v._a._v._n;
+             if (!std::holds_alternative<Number>(expList[0]._v._a._v)) return Exp{};
+
+             Number sub = std::get<Number>(expList[0]._v._a._v);
 
              std::for_each(expList.begin() + 1, expList.end(), [&sub](const auto& e) {
                  if (e._t != 0) return;
                  Atom a = e._v._a;
-                 if (a._t == 0) return;
-                 sub -= a._v._n;
+                 if (!std::holds_alternative<Number>(a._v)) return;
+                 sub -= std::get<Number>(a._v);
              });
 
-             ret._v._a._v._n = sub;
+             ret._v._a._v = sub;
              return ret;
          }}}},
         1,
@@ -84,18 +86,19 @@ void Env::init() {
         {._l = {Procedure{[](std::vector<Exp> expList, Env) -> Exp {
              Exp ret;
              ret._t = 0;
-             ret._v._a._t = 1;
 
-             Number mul = expList[0]._v._a._v._n;
+             if (!std::holds_alternative<Number>(expList[0]._v._a._v)) return Exp{};
+
+             Number mul = std::get<Number>(expList[0]._v._a._v);
 
              std::for_each(expList.begin() + 1, expList.end(), [&mul](const auto& e) {
                  if (e._t != 0) return;
                  Atom a = e._v._a;
-                 if (a._t == 0) return;
-                 mul *= a._v._n;
+                 if (!std::holds_alternative<Number>(a._v)) return;
+                 mul *= std::get<Number>(a._v);
              });
 
-             ret._v._a._v._n = mul;
+             ret._v._a._v = mul;
              return ret;
          }}}},
         1,
@@ -105,18 +108,19 @@ void Env::init() {
         {._l = {Procedure{[](std::vector<Exp> expList, Env) -> Exp {
              Exp ret;
              ret._t = 0;
-             ret._v._a._t = 1;
 
-             Number div = expList[0]._v._a._v._n;
+             if (!std::holds_alternative<Number>(expList[0]._v._a._v)) return Exp{};
+
+             Number div = std::get<Number>(expList[0]._v._a._v);
 
              std::for_each(expList.begin() + 1, expList.end(), [&div](const auto& e) {
                  if (e._t != 0) return;
                  Atom a = e._v._a;
-                 if (a._t == 0) return;
-                 div /= a._v._n;
+                 if (!std::holds_alternative<Number>(a._v)) return;
+                 div /= std::get<Number>(a._v);
              });
 
-             ret._v._a._v._n = div;
+             ret._v._a._v = div;
              return ret;
          }}}},
         1,
@@ -127,9 +131,14 @@ void Env::init() {
              if (expList.size() != 2) return {};
              Exp ret;
              ret._t = 0;
-             ret._v._a._t = 1;
-             Number cond = expList[0]._v._a._v._n > expList[1]._v._a._v._n;
-             ret._v._a._v._n = cond;
+
+             if (!std::holds_alternative<Number>(expList[0]._v._a._v) ||
+                 !std::holds_alternative<Number>(expList[1]._v._a._v))
+                 return Exp{};
+
+             Number cond =
+                 std::get<Number>(expList[0]._v._a._v) > std::get<Number>(expList[1]._v._a._v);
+             ret._v._a._v = cond;
              return ret;
          }}}},
         1,
@@ -140,9 +149,13 @@ void Env::init() {
              if (expList.size() != 2) return {};
              Exp ret;
              ret._t = 0;
-             ret._v._a._t = 1;
-             Number cond = expList[0]._v._a._v._n >= expList[1]._v._a._v._n;
-             ret._v._a._v._n = cond;
+             if (!std::holds_alternative<Number>(expList[0]._v._a._v) ||
+                 !std::holds_alternative<Number>(expList[1]._v._a._v))
+                 return Exp{};
+
+             Number cond =
+                 std::get<Number>(expList[0]._v._a._v) >= std::get<Number>(expList[1]._v._a._v);
+             ret._v._a._v = cond;
              return ret;
          }}}},
         1,
@@ -153,9 +166,13 @@ void Env::init() {
              if (expList.size() != 2) return {};
              Exp ret;
              ret._t = 0;
-             ret._v._a._t = 1;
-             Number cond = expList[0]._v._a._v._n < expList[1]._v._a._v._n;
-             ret._v._a._v._n = cond;
+             if (!std::holds_alternative<Number>(expList[0]._v._a._v) ||
+                 !std::holds_alternative<Number>(expList[1]._v._a._v))
+                 return Exp{};
+
+             Number cond =
+                 std::get<Number>(expList[0]._v._a._v) < std::get<Number>(expList[1]._v._a._v);
+             ret._v._a._v = cond;
              return ret;
          }}}},
         1,
@@ -166,9 +183,13 @@ void Env::init() {
              if (expList.size() != 2) return {};
              Exp ret;
              ret._t = 0;
-             ret._v._a._t = 1;
-             Number cond = expList[0]._v._a._v._n <= expList[1]._v._a._v._n;
-             ret._v._a._v._n = cond;
+             if (!std::holds_alternative<Number>(expList[0]._v._a._v) ||
+                 !std::holds_alternative<Number>(expList[1]._v._a._v))
+                 return Exp{};
+
+             Number cond =
+                 std::get<Number>(expList[0]._v._a._v) <= std::get<Number>(expList[1]._v._a._v);
+             ret._v._a._v = cond;
              return ret;
          }}}},
         1,
@@ -179,9 +200,13 @@ void Env::init() {
              if (expList.size() != 2) return {};
              Exp ret;
              ret._t = 0;
-             ret._v._a._t = 0;
-             Number cond = expList[0]._v._a._v._n == expList[1]._v._a._v._n;
-             ret._v._a._v._n = cond;
+             if (!std::holds_alternative<Number>(expList[0]._v._a._v) ||
+                 !std::holds_alternative<Number>(expList[1]._v._a._v))
+                 return Exp{};
+
+             Number cond =
+                 std::get<Number>(expList[0]._v._a._v) == std::get<Number>(expList[1]._v._a._v);
+             ret._v._a._v = cond;
              return ret;
          }}}},
         1,
@@ -192,8 +217,8 @@ void Env::init() {
              if (expList.size() != 1) return {};
              Exp ret;
              ret._t = 0;
-             ret._v._a._t = 1;
-             ret._v._a._v._n = Number::abs(expList[0]._v._a._v._n);
+             if (!std::holds_alternative<Number>(expList[0]._v._a._v)) return Exp{};
+             ret._v._a._v = Number::abs(std::get<Number>(expList[0]._v._a._v));
              return ret;
          }}}},
         1,

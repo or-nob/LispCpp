@@ -33,13 +33,8 @@ struct Number {
 };
 
 struct Atom {
-    typedef struct {
-        std::string _s;
-        Number _n;
-    } AtomType;
-
+    using AtomType = std::variant<std::string, Number>;
     AtomType _v;
-    std::uint8_t _t;
 };
 
 struct Exp {
