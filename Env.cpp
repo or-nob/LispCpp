@@ -18,13 +18,14 @@ Env::Env(const std::vector<std::string>& keys, const std::vector<Exp>& args, Env
 Env& Env::find(const std::string& k) {
     const auto& ret =
         std::find_if(_env.begin(), _env.end(), [&k](const auto& e) { return e.first == k; });
-    if (!_outer) return *this;
-    return ret != _env.end() ? *this : std::any_cast<Env>(*_outer).find(k);
+    if (ret != _env.end()) return *this;
+    if (!_outer) std::runtime_error("Cannot find");
+    return _outer->find(k);
 }
 
 void Env::init() {
     _env["begin"] = Exp{
-        {._l = {std::function<Exp(std::vector<Exp>)>{[](std::vector<Exp> expList) {
+        {._l = {Procedure{[](std::vector<Exp> expList, Env) {
              Exp ret;
              ret._t = 1;
              std::for_each(expList.begin(), expList.end(),
@@ -34,7 +35,7 @@ void Env::init() {
         1,
     };
 
-    std::function<Exp(std::vector<Exp>)> add = [](std::vector<Exp> expList) -> Exp {
+    Procedure add = [](std::vector<Exp> expList, Env) -> Exp {
         Exp ret;
         ret._t = 0;
         ret._v._a._t = 1;
@@ -59,7 +60,7 @@ void Env::init() {
     };
 
     _env["-"] = Exp{
-        {._l = {std::function<Exp(std::vector<Exp>)>{[](std::vector<Exp> expList) -> Exp {
+        {._l = {Procedure{[](std::vector<Exp> expList, Env) -> Exp {
              Exp ret;
              ret._t = 0;
              ret._v._a._t = 1;
@@ -80,7 +81,7 @@ void Env::init() {
     };
 
     _env["*"] = Exp{
-        {._l = {std::function<Exp(std::vector<Exp>)>{[](std::vector<Exp> expList) -> Exp {
+        {._l = {Procedure{[](std::vector<Exp> expList, Env) -> Exp {
              Exp ret;
              ret._t = 0;
              ret._v._a._t = 1;
@@ -101,7 +102,7 @@ void Env::init() {
     };
 
     _env["/"] = Exp{
-        {._l = {std::function<Exp(std::vector<Exp>)>{[](std::vector<Exp> expList) -> Exp {
+        {._l = {Procedure{[](std::vector<Exp> expList, Env) -> Exp {
              Exp ret;
              ret._t = 0;
              ret._v._a._t = 1;
@@ -122,7 +123,7 @@ void Env::init() {
     };
 
     _env[">"] = Exp{
-        {._l = {std::function<Exp(std::vector<Exp>)>{[](std::vector<Exp> expList) -> Exp {
+        {._l = {Procedure{[](std::vector<Exp> expList, Env) -> Exp {
              if (expList.size() != 2) return {};
              Exp ret;
              ret._t = 0;
@@ -135,7 +136,7 @@ void Env::init() {
     };
 
     _env[">="] = Exp{
-        {._l = {std::function<Exp(std::vector<Exp>)>{[](std::vector<Exp> expList) -> Exp {
+        {._l = {Procedure{[](std::vector<Exp> expList, Env) -> Exp {
              if (expList.size() != 2) return {};
              Exp ret;
              ret._t = 0;
@@ -148,7 +149,7 @@ void Env::init() {
     };
 
     _env["<"] = Exp{
-        {._l = {std::function<Exp(std::vector<Exp>)>{[](std::vector<Exp> expList) -> Exp {
+        {._l = {Procedure{[](std::vector<Exp> expList, Env) -> Exp {
              if (expList.size() != 2) return {};
              Exp ret;
              ret._t = 0;
@@ -161,7 +162,7 @@ void Env::init() {
     };
 
     _env["<="] = Exp{
-        {._l = {std::function<Exp(std::vector<Exp>)>{[](std::vector<Exp> expList) -> Exp {
+        {._l = {Procedure{[](std::vector<Exp> expList, Env) -> Exp {
              if (expList.size() != 2) return {};
              Exp ret;
              ret._t = 0;
@@ -174,7 +175,7 @@ void Env::init() {
     };
 
     _env["="] = Exp{
-        {._l = {std::function<Exp(std::vector<Exp>)>{[this](std::vector<Exp> expList) -> Exp {
+        {._l = {Procedure{[this](std::vector<Exp> expList, Env) -> Exp {
              if (expList.size() != 2) return {};
              Exp ret;
              ret._t = 0;
@@ -187,7 +188,7 @@ void Env::init() {
     };
 
     _env["abs"] = Exp{
-        {._l = {std::function<Exp(std::vector<Exp>)>{[](std::vector<Exp> expList) -> Exp {
+        {._l = {Procedure{[](std::vector<Exp> expList, Env) -> Exp {
              if (expList.size() != 1) return {};
              Exp ret;
              ret._t = 0;
@@ -199,12 +200,10 @@ void Env::init() {
     };
 }
 
-Exp& Env::operator[](const std::string& k) {
-    // std::for_each(_env.begin(), _env.end(), [](const auto& e) { std::cout << e.first; });
-    return _env[k];
-}
+Exp& Env::operator[](const std::string& k) { return _env[k]; }
 
 void Env::printKeys() {
     std::for_each(_env.begin(), _env.end(), [](const auto& e) { std::cout << e.first << " "; });
     std::cout << '\n';
+    if (_outer) _outer->printKeys();
 }

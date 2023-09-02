@@ -144,9 +144,9 @@ Number Number::abs(const Number& o) {
 
 Exp::Exp(const Exp::ExpType& v, std::uint8_t t) : _v(v), _t(t) {}
 
-Exp::Exp(const std::vector<std::string>& params, const Exp& body, Env& env) {
-    _v = {._l = {std::function<Exp(std::vector<Exp>)>{
-              [this, params, body, &env](std::vector<Exp> expList) -> Exp {
+Exp::Exp(const std::vector<std::string>& params, const Exp& body) {
+    _v = {._l = {std::function<Exp(std::vector<Exp>, Env)>{
+              [this, params, body](std::vector<Exp> expList, Env env) -> Exp {
                   Env e{params, expList, env};
                   return Eval::eval(body, e);
               }}}};

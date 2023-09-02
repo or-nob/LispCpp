@@ -55,7 +55,7 @@ struct Exp {
 
     Exp() = default;
     Exp(const ExpType& v, std::uint8_t t);
-    Exp(const std::vector<std::string>& params, const Exp& body, Env& env);
+    Exp(const std::vector<std::string>& params, const Exp& body);
 
     Exp& operator=(const Exp& o);
 
@@ -64,3 +64,4 @@ struct Exp {
 
 enum class Types { SYMBOL, NUMBER, ATOM, LIST, EXP, ENV };
 
+using Procedure = std::function<Exp(std::vector<Exp>, Env)>;

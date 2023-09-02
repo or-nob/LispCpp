@@ -28,6 +28,7 @@ int main(void) {
     for (std::string line; std::getline(std::cin, line);) {
         Tokenizer t{line};
         Exp::print(Eval::eval(t.readFromTokens(), e));
+        // e.printKeys();
     }
 
     return 0;

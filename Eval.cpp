@@ -37,18 +37,18 @@ Exp Eval::eval(Exp e, Env& env) {
                                   params.emplace_back(p._v._a._v._s);
                               });
                 Exp body = std::any_cast<Exp>(e._v._l[2]);
-                return Exp{params, body, env};
-            }
+                return Exp{params, body};
+            } else {
+                auto procExp = eval(fExp, env);
 
-            auto procExp = eval(fExp, env);
-            auto procExpFunc =
-                std::any_cast<std::function<Exp(std::vector<Exp>)>>(procExp._v._l[0]);
-            std::vector<Exp> eList;
-            for (size_t i = 1; i < e._v._l.size(); ++i) {
-                eList.emplace_back(eval(std::any_cast<Exp>(e._v._l[i]), env));
-            }
+                auto procExpFunc = std::any_cast<Procedure>(procExp._v._l[0]);
+                std::vector<Exp> eList;
+                for (size_t i = 1; i < e._v._l.size(); ++i) {
+                    eList.emplace_back(eval(std::any_cast<Exp>(e._v._l[i]), env));
+                }
 
-            return procExpFunc(eList);
+                return procExpFunc(eList, env);
+            }
         } catch (...) {
             return Exp{};
         }
