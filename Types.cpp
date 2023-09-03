@@ -23,74 +23,60 @@ Number& Number::operator/=(const Number& o) {
     return *this;
 }
 
-Number Number::operator+(const Number& o) {
-    bool isInt = std::holds_alternative<int>(_v);
+Number arithmaticOperation(const Number& self, const Number& o,
+                           const std::function<float(float, float)>& op) {
+    bool isInt = std::holds_alternative<int>(self._v);
     bool isOtherInt = std::holds_alternative<int>(o._v);
 
-    float f = isInt ? std::get<int>(_v) : std::get<float>(_v);
+    float f = isInt ? std::get<int>(self._v) : std::get<float>(self._v);
     float s = isOtherInt ? std::get<int>(o._v) : std::get<float>(o._v);
 
-    return {._v = (isInt && isOtherInt ? static_cast<int>(f + s) : static_cast<float>(f + s))};
+    return {._v =
+                (isInt && isOtherInt ? static_cast<int>(op(f, s)) : static_cast<float>(op(f, s)))};
+}
+
+Number Number::operator+(const Number& o) {
+    return arithmaticOperation(*this, o, [](float f, float s) { return f + s; });
 }
 
 Number Number::operator-(const Number& o) {
-    bool isInt = std::holds_alternative<int>(_v);
-    bool isOtherInt = std::holds_alternative<int>(o._v);
-
-    float f = isInt ? std::get<int>(_v) : std::get<float>(_v);
-    float s = isOtherInt ? std::get<int>(o._v) : std::get<float>(o._v);
-
-    return {._v = (isInt && isOtherInt ? static_cast<int>(f - s) : static_cast<float>(f - s))};
+    return arithmaticOperation(*this, o, [](float f, float s) { return f - s; });
 }
 
 Number Number::operator*(const Number& o) {
-    bool isInt = std::holds_alternative<int>(_v);
-    bool isOtherInt = std::holds_alternative<int>(o._v);
-
-    float f = isInt ? std::get<int>(_v) : std::get<float>(_v);
-    float s = isOtherInt ? std::get<int>(o._v) : std::get<float>(o._v);
-
-    return {._v = (isInt && isOtherInt ? static_cast<int>(f * s) : static_cast<float>(f * s))};
+    return arithmaticOperation(*this, o, [](float f, float s) { return f * s; });
 }
 
 Number Number::operator/(const Number& o) {
-    bool isInt = std::holds_alternative<int>(_v);
-    bool isOtherInt = std::holds_alternative<int>(o._v);
+    return arithmaticOperation(*this, o, [](float f, float s) { return f / s; });
+}
 
-    float f = isInt ? std::get<int>(_v) : std::get<float>(_v);
-    float s = isOtherInt ? std::get<int>(o._v) : std::get<float>(o._v);
-
-    return {._v = (isInt && isOtherInt ? static_cast<int>(f / s) : static_cast<float>(f / s))};
+Number cmpOperation(const Number& self, const Number& o,
+                    const std::function<int(float, float)>& op) {
+    float f =
+        std::holds_alternative<int>(self._v) ? std::get<int>(self._v) : std::get<float>(self._v);
+    float s = std::holds_alternative<int>(o._v) ? std::get<int>(o._v) : std::get<float>(o._v);
+    return {._v = op(f, s)};
 }
 
 Number Number::operator>(const Number& o) const {
-    float f = std::holds_alternative<int>(_v) ? std::get<int>(_v) : std::get<float>(_v);
-    float s = std::holds_alternative<int>(o._v) ? std::get<int>(o._v) : std::get<float>(o._v);
-    return {._v = f > s};
+    return cmpOperation(*this, o, [](float f, float s) { return f > s; });
 }
 
 Number Number::operator>=(const Number& o) const {
-    float f = std::holds_alternative<int>(_v) ? std::get<int>(_v) : std::get<float>(_v);
-    float s = std::holds_alternative<int>(o._v) ? std::get<int>(o._v) : std::get<float>(o._v);
-    return {._v = f >= s};
+    return cmpOperation(*this, o, [](float f, float s) { return f >= s; });
 }
 
 Number Number::operator<(const Number& o) const {
-    float f = std::holds_alternative<int>(_v) ? std::get<int>(_v) : std::get<float>(_v);
-    float s = std::holds_alternative<int>(o._v) ? std::get<int>(o._v) : std::get<float>(o._v);
-    return {._v = f < s};
+    return cmpOperation(*this, o, [](float f, float s) { return f < s; });
 }
 
 Number Number::operator<=(const Number& o) const {
-    float f = std::holds_alternative<int>(_v) ? std::get<int>(_v) : std::get<float>(_v);
-    float s = std::holds_alternative<int>(o._v) ? std::get<int>(o._v) : std::get<float>(o._v);
-    return {._v = f <= s};
+    return cmpOperation(*this, o, [](float f, float s) { return f <= s; });
 }
 
 Number Number::operator==(const Number& o) const {
-    float f = std::holds_alternative<int>(_v) ? std::get<int>(_v) : std::get<float>(_v);
-    float s = std::holds_alternative<int>(o._v) ? std::get<int>(o._v) : std::get<float>(o._v);
-    return {._v = f == s};
+    return cmpOperation(*this, o, [](float f, float s) { return f == s; });
 }
 
 Number Number::abs(const Number& o) {
