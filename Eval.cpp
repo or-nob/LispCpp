@@ -4,7 +4,7 @@
 
 #include "Types.h"
 
-Exp Eval::eval(Exp e, Env& env) {
+Exp Eval::eval(Exp e, Env&& env) {
     bool isAtom = std::holds_alternative<Atom>(e._v);
     if (isAtom && std::holds_alternative<std::string>(std::get<Atom>(e._v)._v)) {
         return env.find(std::get<std::string>(
@@ -28,29 +28,32 @@ Exp Eval::eval(Exp e, Env& env) {
                     return Exp{};
                 std::string symbol =
                     std::get<std::string>(std::get<Atom>(std::any_cast<Exp>(expList[1])._v)._v);
-                env[symbol] = eval(std::any_cast<Exp>(expList[2]), env);
+                env[symbol] = eval(std::any_cast<Exp>(expList[2]), std::forward<Env>(env));
                 return Exp{};
             } else if (fSym == "if") {
                 Exp test = std::any_cast<Exp>(expList[1]);
                 Exp conseq = std::any_cast<Exp>(expList[2]);
                 Exp alter = std::any_cast<Exp>(expList[3]);
 
-                Exp cond = eval(test, env);
+                Exp cond = eval(test, std::forward<Env>(env));
                 if (!std::holds_alternative<Number>(std::get<Atom>(cond._v)._v) ||
                     !std::holds_alternative<int>(
-                        std::get<Number>(std::get<Atom>(eval(test, env)._v)._v)._v))
+                        std::get<Number>(std::get<Atom>(eval(test, std::forward<Env>(env))._v)._v)
+                            ._v))
                     return Exp{};
 
-                return std::get<int>(std::get<Number>(std::get<Atom>(eval(test, env)._v)._v)._v)
-                           ? eval(conseq, env)
-                           : eval(alter, env);
+                return std::get<int>(std::get<Number>(
+                                         std::get<Atom>(eval(test, std::forward<Env>(env))._v)._v)
+                                         ._v)
+                           ? eval(conseq, std::forward<Env>(env))
+                           : eval(alter, std::forward<Env>(env));
             } else if (fSym == "set!") {
                 if (!std::holds_alternative<std::string>(
                         std::get<Atom>(std::any_cast<Exp>(expList[1])._v)._v))
                     return Exp{};
                 std::string sym =
                     std::get<std::string>(std::get<Atom>(std::any_cast<Exp>(expList[1])._v)._v);
-                env.find(sym)[sym] = eval(std::any_cast<Exp>(expList[2]), env);
+                env.find(sym)[sym] = eval(std::any_cast<Exp>(expList[2]), std::forward<Env>(env));
                 return Exp{};
             } else if (fSym == "lambda") {
                 Exp listExpParams = std::any_cast<Exp>(expList[1]);
@@ -65,13 +68,14 @@ Exp Eval::eval(Exp e, Env& env) {
                 Exp body = std::any_cast<Exp>(expList[2]);
                 return Exp{params, body};
             } else {
-                auto procExp = eval(fExp, env);
+                auto procExp = eval(fExp, std::forward<Env>(env));
                 if (!std::holds_alternative<Procedure>(procExp._v)) return Exp{};
 
                 auto procExpFunc = std::get<Procedure>(procExp._v);
                 std::vector<Exp> eList;
                 for (size_t i = 1; i < expList.size(); ++i) {
-                    eList.emplace_back(eval(std::any_cast<Exp>(expList[i]), env));
+                    eList.emplace_back(
+                        eval(std::any_cast<Exp>(expList[i]), std::forward<Env>(env)));
                 }
 
                 return procExpFunc(eList, env);

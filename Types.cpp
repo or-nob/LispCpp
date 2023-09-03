@@ -92,8 +92,7 @@ Exp::Exp(const Exp::ExpType& v) : _v(v) {}
 
 Exp::Exp(const std::vector<std::string>& params, const Exp& body) {
     _v = Procedure{[params, body](std::vector<Exp> expList, Env env) -> Exp {
-        Env e{params, expList, env};
-        return Eval::eval(body, e);
+        return Eval::eval(body, Env{params, expList, env});
     }};
 }
 

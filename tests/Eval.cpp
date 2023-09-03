@@ -4,10 +4,9 @@
 #include "gtest/gtest.h"
 
 TEST(Eval, evalSimpleExpr) {
-    Env env{};
     Tokenizer t{"(+ 10 10)"};
 
-    Exp e = Eval::eval(t.readFromTokens(), env);
+    Exp e = Eval::eval(t.readFromTokens(), Env{});
     EXPECT_TRUE(std::holds_alternative<Atom>(e._v));
 
     const Atom& a = std::get<Atom>(e._v);
@@ -20,7 +19,7 @@ TEST(Eval, evalSimpleExpr) {
 
     Tokenizer t1{"(+ 10.5 10)"};
 
-    Exp e1 = Eval::eval(t1.readFromTokens(), env);
+    Exp e1 = Eval::eval(t1.readFromTokens(), Env{});
     EXPECT_TRUE(std::holds_alternative<Atom>(e1._v));
 
     const Atom& a1 = std::get<Atom>(e1._v);
@@ -33,10 +32,9 @@ TEST(Eval, evalSimpleExpr) {
 }
 
 TEST(Eval, evalVarExpr) {
-    Env env{};
     Tokenizer t{"(begin (define r 50) (/ r 5.1))"};
 
-    Exp e = Eval::eval(t.readFromTokens(), env);
+    Exp e = Eval::eval(t.readFromTokens(), Env{});
     EXPECT_TRUE(std::holds_alternative<Exp::ExpList>(e._v));
 
     Exp::ExpList l = std::get<Exp::ExpList>(e._v);
@@ -54,10 +52,9 @@ TEST(Eval, evalVarExpr) {
 }
 
 TEST(Eval, evalIfExpr) {
-    Env env{};
     Tokenizer t{"(begin (if (> 20 10) (abs -1.1) (- 3 3)))"};
 
-    Exp e = Eval::eval(t.readFromTokens(), env);
+    Exp e = Eval::eval(t.readFromTokens(), Env{});
     EXPECT_TRUE(std::holds_alternative<Exp::ExpList>(e._v));
 
     Exp::ExpList l = std::get<Exp::ExpList>(e._v);
@@ -75,10 +72,9 @@ TEST(Eval, evalIfExpr) {
 }
 
 TEST(Eval, evalComplexExpr) {
-    Env env{};
     Tokenizer t{"(begin (define r 5) (if (= r 5) (+ r 5.1) (+ r 5)))"};
 
-    Exp e = Eval::eval(t.readFromTokens(), env);
+    Exp e = Eval::eval(t.readFromTokens(), Env{});
     EXPECT_TRUE(std::holds_alternative<Exp::ExpList>(e._v));
 
     Exp::ExpList l = std::get<Exp::ExpList>(e._v);
@@ -101,13 +97,13 @@ TEST(Eval, evalFuncExpr) {
 
     Tokenizer t{"(define circle-area (lambda (r) (* 3.14 (* r r))))"};
 
-    Exp e = Eval::eval(t.readFromTokens(), env);
+    Exp e = Eval::eval(t.readFromTokens(), std::forward<Env>(env));
     EXPECT_TRUE(std::holds_alternative<Atom>(e._v));
 
     EXPECT_NO_THROW(env.find("circle-area")["circle-area"]);
 
     Tokenizer t1{"(circle-area 5)"};
-    Exp ret = Eval::eval(t1.readFromTokens(), env);
+    Exp ret = Eval::eval(t1.readFromTokens(), std::forward<Env>(env));
     EXPECT_TRUE(std::holds_alternative<Atom>(ret._v));
 
     Atom a = std::get<Atom>(ret._v);
@@ -122,13 +118,13 @@ TEST(Eval, evalRecFuncExpr) {
     EXPECT_THROW(env.find("fact"), std::runtime_error);
 
     Tokenizer t{"(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1))))))"};
-    Exp e = Eval::eval(t.readFromTokens(), env);
+    Exp e = Eval::eval(t.readFromTokens(), std::forward<Env>(env));
     EXPECT_TRUE(std::holds_alternative<Atom>(e._v));
 
     EXPECT_NO_THROW(env.find("fact")["fact"]);
 
     Tokenizer t1{"(fact 5)"};
-    Exp ret = Eval::eval(t1.readFromTokens(), env);
+    Exp ret = Eval::eval(t1.readFromTokens(), std::forward<Env>(env));
     EXPECT_TRUE(std::holds_alternative<Atom>(ret._v));
 
     Atom a = std::get<Atom>(ret._v);
