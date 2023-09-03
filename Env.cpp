@@ -9,9 +9,7 @@ Env::Env() { init(); }
 
 Env::Env(const std::vector<std::string>& keys, const std::vector<Exp>& args, Env& outer) {
     init();
-    for (size_t i = 0; i < keys.size(); ++i) {
-        _env[keys[i]] = args[i];
-    }
+    for (size_t i = 0; i < keys.size(); ++i) _env[keys[i]] = args[i];
     _outer = &outer;
 }
 
@@ -19,7 +17,7 @@ Env& Env::find(const std::string& k) {
     const auto& ret =
         std::find_if(_env.begin(), _env.end(), [&k](const auto& e) { return e.first == k; });
     if (ret != _env.end()) return *this;
-    if (!_outer) std::runtime_error("Cannot find");
+    if (!_outer) throw std::runtime_error("Cannot find");
     return _outer->find(k);
 }
 

@@ -31,8 +31,11 @@ Number arithmaticOperation(const Number& self, const Number& o,
     float f = isInt ? std::get<int>(self._v) : std::get<float>(self._v);
     float s = isOtherInt ? std::get<int>(o._v) : std::get<float>(o._v);
 
-    return {._v =
-                (isInt && isOtherInt ? static_cast<int>(op(f, s)) : static_cast<float>(op(f, s)))};
+    if (isInt && isOtherInt) {
+        return {._v = static_cast<int>(op(f, s))};
+    } else {
+        return {._v = static_cast<float>(op(f, s))};
+    }
 }
 
 Number Number::operator+(const Number& o) {
@@ -56,7 +59,7 @@ Number cmpOperation(const Number& self, const Number& o,
     float f =
         std::holds_alternative<int>(self._v) ? std::get<int>(self._v) : std::get<float>(self._v);
     float s = std::holds_alternative<int>(o._v) ? std::get<int>(o._v) : std::get<float>(o._v);
-    return {._v = op(f, s)};
+    return {._v = static_cast<int>(op(f, s))};
 }
 
 Number Number::operator>(const Number& o) const {
@@ -81,14 +84,14 @@ Number Number::operator==(const Number& o) const {
 
 Number Number::abs(const Number& o) {
     float s = std::holds_alternative<int>(o._v) ? std::get<int>(o._v) : std::get<float>(o._v);
-    return {._v = (std::holds_alternative<int>(o._v) ? static_cast<int>(fabs(s))
-                                                     : static_cast<float>(fabs(s)))};
+    if (std::holds_alternative<int>(o._v)) return {._v = static_cast<int>(fabs(s))};
+    return {._v = static_cast<float>(fabs(s))};
 }
 
 Exp::Exp(const Exp::ExpType& v) : _v(v) {}
 
 Exp::Exp(const std::vector<std::string>& params, const Exp& body) {
-    _v = Procedure{[this, params, body](std::vector<Exp> expList, Env env) -> Exp {
+    _v = Procedure{[params, body](std::vector<Exp> expList, Env env) -> Exp {
         Env e{params, expList, env};
         return Eval::eval(body, e);
     }};

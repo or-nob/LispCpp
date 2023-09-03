@@ -1,6 +1,3 @@
-# set(CMAKE_CXX_COMPILER "/usr/local/opt/llvm@12/bin/clang++")
-# set(CMAKE_CXX_STANDARD 17)
-
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -11,10 +8,15 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-# message(STATUS ${GTEST_LIBRARIES})
-
 set(PROJECT_TEST_NAME lispTests)
-add_executable(${PROJECT_TEST_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp ${CMAKE_CURRENT_SOURCE_DIR}/Types.cpp)
+add_executable(${PROJECT_TEST_NAME}
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Types.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Tokenizer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Eval.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Env.cpp
+    )
+
 target_link_libraries(${PROJECT_TEST_NAME} PRIVATE gtest_main lisp)
 enable_testing()
 add_test(

@@ -42,10 +42,12 @@ Exp Tokenizer::readFromTokensRec(std::queue<std::string>& tokens) {
         tokens.pop();
         return e;
     } else if (t == ")") {
-        return {};
+        throw std::runtime_error("Malformed expression");
     } else {
         return Exp{Exp::ExpType{getAtom(t)}};
     }
+
+    return Exp{};
 }
 
 Atom Tokenizer::getAtom(const std::string& t) {
@@ -53,7 +55,10 @@ Atom Tokenizer::getAtom(const std::string& t) {
     try {
         int i = std::stoi(t);
         float f = std::stof(t);
-        ret._v = Number{._v = (i == f ? i : f)};
+        if (i == f)
+            ret._v = Number{._v = i};
+        else
+            ret._v = Number{._v = f};
     } catch (...) {
         std::get<std::string>(ret._v) = t;
     }

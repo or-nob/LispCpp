@@ -20,9 +20,9 @@ TEST(Number, numberOperationsTests) {
     n1 /= n2;
     EXPECT_NEAR(std::get<float>((n1)._v), static_cast<float>(5.0), 0.01);
 
-    EXPECT_EQ(std::get<int>((n1 > n2)._v), 1);
-    EXPECT_EQ(std::get<int>((n1 >= n2)._v), 1);
-    EXPECT_EQ(std::get<int>((n1 < n2)._v), 0);
-    EXPECT_EQ(std::get<int>((n1 <= n2)._v), 0);
+    EXPECT_TRUE(std::get<int>((n1 > n2)._v));
+    EXPECT_TRUE(std::get<int>((n1 >= n2)._v));
+    EXPECT_FALSE(std::get<int>((n1 < n2)._v));
+    EXPECT_FALSE(std::get<int>((n1 <= n2)._v));
 }
 
