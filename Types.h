@@ -37,9 +37,13 @@ struct Atom {
     AtomType _v;
 };
 
+struct Exp;
+
+using Procedure = std::function<Exp(std::vector<Exp>, Env)>;
+
 struct Exp {
     using ExpList = std::vector<std::any>;
-    using ExpType = std::variant<Atom, ExpList>;
+    using ExpType = std::variant<Atom, ExpList, Procedure>;
 
     ExpType _v;
     Exp() = default;
@@ -52,5 +56,3 @@ struct Exp {
 };
 
 enum class Types { SYMBOL, NUMBER, ATOM, LIST, EXP, ENV };
-
-using Procedure = std::function<Exp(std::vector<Exp>, Env)>;

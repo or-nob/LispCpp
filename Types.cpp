@@ -102,10 +102,10 @@ Number Number::abs(const Number& o) {
 Exp::Exp(const Exp::ExpType& v) : _v(v) {}
 
 Exp::Exp(const std::vector<std::string>& params, const Exp& body) {
-    _v = ExpList{Procedure{[this, params, body](std::vector<Exp> expList, Env env) -> Exp {
+    _v = Procedure{[this, params, body](std::vector<Exp> expList, Env env) -> Exp {
         Env e{params, expList, env};
         return Eval::eval(body, e);
-    }}};
+    }};
 }
 
 Exp& Exp::operator=(const Exp& o) {

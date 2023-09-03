@@ -24,13 +24,31 @@ Env& Env::find(const std::string& k) {
 }
 
 void Env::init() {
-    _env["begin"] = Exp{Exp::ExpType{Exp::ExpList{{Procedure{[](std::vector<Exp> expList, Env) {
+    _env["begin"] = Exp{Exp::ExpType{Procedure{[](std::vector<Exp> expList, Env) {
         Exp ret;
         ret._v = Exp::ExpList{};
         std::for_each(expList.begin(), expList.end(),
                       [&ret](const auto& e) { std::get<Exp::ExpList>(ret._v).emplace_back(e); });
         return ret;
-    }}}}}};
+    }}}};
+
+    // auto f = [](const std::vector<Exp>& expList, std::function<void(Number&, Number&)> op) {
+    //     Exp ret;
+
+    //     if (!std::holds_alternative<Number>(std::get<Atom>(expList[0]._v)._v)) return Exp{};
+
+    //     Number acc = std::get<Number>(std::get<Atom>(expList[0]._v)._v);
+
+    //     std::for_each(expList.begin() + 1, expList.end(), [&acc, &op](const Exp& e) {
+    //         if (!std::holds_alternative<Atom>(e._v)) return;
+    //         Atom a = std::get<Atom>(e._v);
+    //         if (!std::holds_alternative<Number>(a._v)) return;
+    //         op(acc, std::get<Number>(a._v));
+    //     });
+
+    //     ret._v = Atom{._v = Number{acc}};
+    //     return ret;
+    // };
 
     Procedure add = [](std::vector<Exp> expList, Env) -> Exp {
         Exp ret;
@@ -50,9 +68,9 @@ void Env::init() {
         return ret;
     };
 
-    _env["+"] = Exp{Exp::ExpType{Exp::ExpList{{add}}}};
+    _env["+"] = Exp{Exp::ExpType{add}};
 
-    _env["-"] = Exp{Exp::ExpType{Exp::ExpList{{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
+    _env["-"] = Exp{Exp::ExpType{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
         Exp ret;
 
         if (!std::holds_alternative<Number>(std::get<Atom>(expList[0]._v)._v)) return Exp{};
@@ -68,9 +86,9 @@ void Env::init() {
 
         ret._v = Atom{._v = Number{sub}};
         return ret;
-    }}}}}};
+    }}}};
 
-    _env["*"] = Exp{Exp::ExpType{Exp::ExpList{{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
+    _env["*"] = Exp{Exp::ExpType{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
         Exp ret;
 
         if (!std::holds_alternative<Number>(std::get<Atom>(expList[0]._v)._v)) return Exp{};
@@ -86,9 +104,9 @@ void Env::init() {
 
         ret._v = Atom{._v = Number{mul}};
         return ret;
-    }}}}}};
+    }}}};
 
-    _env["/"] = Exp{Exp::ExpType{Exp::ExpList{{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
+    _env["/"] = Exp{Exp::ExpType{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
         Exp ret;
 
         if (!std::holds_alternative<Number>(std::get<Atom>(expList[0]._v)._v)) return Exp{};
@@ -104,9 +122,9 @@ void Env::init() {
 
         ret._v = Atom{._v = Number{div}};
         return ret;
-    }}}}}};
+    }}}};
 
-    _env[">"] = Exp{Exp::ExpType{Exp::ExpList{{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
+    _env[">"] = Exp{Exp::ExpType{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
         if (expList.size() != 2) return {};
         Exp ret;
 
@@ -117,9 +135,9 @@ void Env::init() {
         ret._v = Atom{._v = (std::get<Number>(std::get<Atom>(expList[0]._v)._v) >
                              std::get<Number>(std::get<Atom>(expList[1]._v)._v))};
         return ret;
-    }}}}}};
+    }}}};
 
-    _env[">="] = Exp{Exp::ExpType{Exp::ExpList{{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
+    _env[">="] = Exp{Exp::ExpType{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
         if (expList.size() != 2) return {};
         Exp ret;
 
@@ -130,9 +148,9 @@ void Env::init() {
         ret._v = Atom{._v = (std::get<Number>(std::get<Atom>(expList[0]._v)._v) >=
                              std::get<Number>(std::get<Atom>(expList[1]._v)._v))};
         return ret;
-    }}}}}};
+    }}}};
 
-    _env["<"] = Exp{Exp::ExpType{Exp::ExpList{{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
+    _env["<"] = Exp{Exp::ExpType{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
         if (expList.size() != 2) return {};
         Exp ret;
 
@@ -143,9 +161,9 @@ void Env::init() {
         ret._v = Atom{._v = (std::get<Number>(std::get<Atom>(expList[0]._v)._v) <
                              std::get<Number>(std::get<Atom>(expList[1]._v)._v))};
         return ret;
-    }}}}}};
+    }}}};
 
-    _env["<="] = Exp{Exp::ExpType{Exp::ExpList{{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
+    _env["<="] = Exp{Exp::ExpType{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
         if (expList.size() != 2) return {};
         Exp ret;
 
@@ -156,30 +174,28 @@ void Env::init() {
         ret._v = Atom{._v = (std::get<Number>(std::get<Atom>(expList[0]._v)._v) <=
                              std::get<Number>(std::get<Atom>(expList[1]._v)._v))};
         return ret;
-    }}}}}};
+    }}}};
 
-    _env["="] =
-        Exp{Exp::ExpType{Exp::ExpList{{Procedure{[this](std::vector<Exp> expList, Env) -> Exp {
-            if (expList.size() != 2) return {};
-            Exp ret;
-            if (!std::holds_alternative<Number>(std::get<Atom>(expList[0]._v)._v) ||
-                !std::holds_alternative<Number>(std::get<Atom>(expList[1]._v)._v))
-                return Exp{};
+    _env["="] = Exp{Exp::ExpType{Procedure{[this](std::vector<Exp> expList, Env) -> Exp {
+        if (expList.size() != 2) return {};
+        Exp ret;
+        if (!std::holds_alternative<Number>(std::get<Atom>(expList[0]._v)._v) ||
+            !std::holds_alternative<Number>(std::get<Atom>(expList[1]._v)._v))
+            return Exp{};
 
-            Number cond = std::get<Number>(std::get<Atom>(expList[0]._v)._v) ==
-                          std::get<Number>(std::get<Atom>(expList[1]._v)._v);
-            ret._v = Atom{._v = cond};
-            return ret;
-        }}}}}};
+        Number cond = std::get<Number>(std::get<Atom>(expList[0]._v)._v) ==
+                      std::get<Number>(std::get<Atom>(expList[1]._v)._v);
+        ret._v = Atom{._v = cond};
+        return ret;
+    }}}};
 
-    _env["abs"] =
-        Exp{Exp::ExpType{Exp::ExpList{{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
-            if (expList.size() != 1) return {};
-            Exp ret;
-            if (!std::holds_alternative<Number>(std::get<Atom>(expList[0]._v)._v)) return Exp{};
-            ret._v = Atom{._v = Number::abs(std::get<Number>(std::get<Atom>(expList[0]._v)._v))};
-            return ret;
-        }}}}}};
+    _env["abs"] = Exp{Exp::ExpType{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
+        if (expList.size() != 1) return {};
+        Exp ret;
+        if (!std::holds_alternative<Number>(std::get<Atom>(expList[0]._v)._v)) return Exp{};
+        ret._v = Atom{._v = Number::abs(std::get<Number>(std::get<Atom>(expList[0]._v)._v))};
+        return ret;
+    }}}};
 }
 
 Exp& Env::operator[](const std::string& k) { return _env[k]; }

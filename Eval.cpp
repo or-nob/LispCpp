@@ -9,9 +9,10 @@ Exp Eval::eval(Exp e, Env& env) {
     if (isAtom && std::holds_alternative<std::string>(std::get<Atom>(e._v)._v)) {
         return env.find(std::get<std::string>(
             std::get<Atom>(e._v)._v))[std::get<std::string>(std::get<Atom>(e._v)._v)];
-    } else if (isAtom && std::holds_alternative<Number>(std::get<Atom>(e._v)._v)) {
+    } else if ((isAtom && std::holds_alternative<Number>(std::get<Atom>(e._v)._v)) ||
+               std::holds_alternative<Procedure>(e._v)) {
         return e;
-    } else if (!isAtom) {
+    } else if (std::holds_alternative<Exp::ExpList>(e._v)) {
         try {
             auto& expList = std::get<Exp::ExpList>(e._v);
             Exp fExp = std::any_cast<Exp>(expList[0]);
@@ -65,8 +66,9 @@ Exp Eval::eval(Exp e, Env& env) {
                 return Exp{params, body};
             } else {
                 auto procExp = eval(fExp, env);
+                if (!std::holds_alternative<Procedure>(procExp._v)) return Exp{};
 
-                auto procExpFunc = std::any_cast<Procedure>(std::get<Exp::ExpList>(procExp._v)[0]);
+                auto procExpFunc = std::get<Procedure>(procExp._v);
                 std::vector<Exp> eList;
                 for (size_t i = 1; i < expList.size(); ++i) {
                     eList.emplace_back(eval(std::any_cast<Exp>(expList[i]), env));
