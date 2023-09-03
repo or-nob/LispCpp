@@ -63,31 +63,31 @@ Number Number::operator/(const Number& o) {
     return {._v = (isInt && isOtherInt ? static_cast<int>(f / s) : static_cast<float>(f / s))};
 }
 
-Number Number::operator>(const Number& o) {
+Number Number::operator>(const Number& o) const {
     float f = std::holds_alternative<int>(_v) ? std::get<int>(_v) : std::get<float>(_v);
     float s = std::holds_alternative<int>(o._v) ? std::get<int>(o._v) : std::get<float>(o._v);
     return {._v = f > s};
 }
 
-Number Number::operator>=(const Number& o) {
+Number Number::operator>=(const Number& o) const {
     float f = std::holds_alternative<int>(_v) ? std::get<int>(_v) : std::get<float>(_v);
     float s = std::holds_alternative<int>(o._v) ? std::get<int>(o._v) : std::get<float>(o._v);
     return {._v = f >= s};
 }
 
-Number Number::operator<(const Number& o) {
+Number Number::operator<(const Number& o) const {
     float f = std::holds_alternative<int>(_v) ? std::get<int>(_v) : std::get<float>(_v);
     float s = std::holds_alternative<int>(o._v) ? std::get<int>(o._v) : std::get<float>(o._v);
     return {._v = f < s};
 }
 
-Number Number::operator<=(const Number& o) {
+Number Number::operator<=(const Number& o) const {
     float f = std::holds_alternative<int>(_v) ? std::get<int>(_v) : std::get<float>(_v);
     float s = std::holds_alternative<int>(o._v) ? std::get<int>(o._v) : std::get<float>(o._v);
     return {._v = f <= s};
 }
 
-Number Number::operator==(const Number& o) {
+Number Number::operator==(const Number& o) const {
     float f = std::holds_alternative<int>(_v) ? std::get<int>(_v) : std::get<float>(_v);
     float s = std::holds_alternative<int>(o._v) ? std::get<int>(o._v) : std::get<float>(o._v);
     return {._v = f == s};

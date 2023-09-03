@@ -32,161 +32,79 @@ void Env::init() {
         return ret;
     }}}};
 
-    // auto f = [](const std::vector<Exp>& expList, std::function<void(Number&, Number&)> op) {
-    //     Exp ret;
-
-    //     if (!std::holds_alternative<Number>(std::get<Atom>(expList[0]._v)._v)) return Exp{};
-
-    //     Number acc = std::get<Number>(std::get<Atom>(expList[0]._v)._v);
-
-    //     std::for_each(expList.begin() + 1, expList.end(), [&acc, &op](const Exp& e) {
-    //         if (!std::holds_alternative<Atom>(e._v)) return;
-    //         Atom a = std::get<Atom>(e._v);
-    //         if (!std::holds_alternative<Number>(a._v)) return;
-    //         op(acc, std::get<Number>(a._v));
-    //     });
-
-    //     ret._v = Atom{._v = Number{acc}};
-    //     return ret;
-    // };
-
-    Procedure add = [](std::vector<Exp> expList, Env) -> Exp {
+    auto arithmaticOperation = [](const std::vector<Exp>& expList,
+                                  std::function<void(Number&, Number&)> op) {
         Exp ret;
 
         if (!std::holds_alternative<Number>(std::get<Atom>(expList[0]._v)._v)) return Exp{};
 
-        Number sum = std::get<Number>(std::get<Atom>(expList[0]._v)._v);
+        Number acc = std::get<Number>(std::get<Atom>(expList[0]._v)._v);
 
-        std::for_each(expList.begin() + 1, expList.end(), [&sum](const Exp& e) {
+        std::for_each(expList.begin() + 1, expList.end(), [&acc, &op](const Exp& e) {
             if (!std::holds_alternative<Atom>(e._v)) return;
             Atom a = std::get<Atom>(e._v);
             if (!std::holds_alternative<Number>(a._v)) return;
-            sum += std::get<Number>(a._v);
+            op(acc, std::get<Number>(a._v));
         });
 
-        ret._v = Atom{._v = Number{sum}};
+        ret._v = Atom{._v = Number{acc}};
         return ret;
+    };
+
+    Procedure add = [&arithmaticOperation](std::vector<Exp> expList, Env) -> Exp {
+        return arithmaticOperation(expList, [](Number& acc, Number& elem) { acc += elem; });
     };
 
     _env["+"] = Exp{Exp::ExpType{add}};
 
-    _env["-"] = Exp{Exp::ExpType{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
-        Exp ret;
+    _env["-"] =
+        Exp{Exp::ExpType{Procedure{[&arithmaticOperation](std::vector<Exp> expList, Env) -> Exp {
+            return arithmaticOperation(expList, [](Number& acc, Number& elem) { acc -= elem; });
+        }}}};
 
-        if (!std::holds_alternative<Number>(std::get<Atom>(expList[0]._v)._v)) return Exp{};
+    _env["*"] =
+        Exp{Exp::ExpType{Procedure{[&arithmaticOperation](std::vector<Exp> expList, Env) -> Exp {
+            return arithmaticOperation(expList, [](Number& acc, Number& elem) { acc *= elem; });
+        }}}};
 
-        Number sub = std::get<Number>(std::get<Atom>(expList[0]._v)._v);
+    _env["/"] =
+        Exp{Exp::ExpType{Procedure{[&arithmaticOperation](std::vector<Exp> expList, Env) -> Exp {
+            return arithmaticOperation(expList, [](Number& acc, Number& elem) { acc /= elem; });
+        }}}};
 
-        std::for_each(expList.begin() + 1, expList.end(), [&sub](const Exp& e) {
-            if (!std::holds_alternative<Atom>(e._v)) return;
-            Atom a = std::get<Atom>(e._v);
-            if (!std::holds_alternative<Number>(a._v)) return;
-            sub -= std::get<Number>(a._v);
-        });
+    auto cmpOperation = [](const std::vector<Exp>& expList,
+                           std::function<Number(const Number&, const Number&)> op) -> Exp {
+        if (expList.size() != 2) return Exp{};
 
-        ret._v = Atom{._v = Number{sub}};
-        return ret;
-    }}}};
-
-    _env["*"] = Exp{Exp::ExpType{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
-        Exp ret;
-
-        if (!std::holds_alternative<Number>(std::get<Atom>(expList[0]._v)._v)) return Exp{};
-
-        Number mul = std::get<Number>(std::get<Atom>(expList[0]._v)._v);
-
-        std::for_each(expList.begin() + 1, expList.end(), [&mul](const auto& e) {
-            if (!std::holds_alternative<Atom>(e._v)) return;
-            Atom a = std::get<Atom>(e._v);
-            if (!std::holds_alternative<Number>(a._v)) return;
-            mul *= std::get<Number>(a._v);
-        });
-
-        ret._v = Atom{._v = Number{mul}};
-        return ret;
-    }}}};
-
-    _env["/"] = Exp{Exp::ExpType{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
-        Exp ret;
-
-        if (!std::holds_alternative<Number>(std::get<Atom>(expList[0]._v)._v)) return Exp{};
-
-        Number div = std::get<Number>(std::get<Atom>(expList[0]._v)._v);
-
-        std::for_each(expList.begin() + 1, expList.end(), [&div](const auto& e) {
-            if (!std::holds_alternative<Atom>(e._v)) return;
-            Atom a = std::get<Atom>(e._v);
-            if (!std::holds_alternative<Number>(a._v)) return;
-            div /= std::get<Number>(a._v);
-        });
-
-        ret._v = Atom{._v = Number{div}};
-        return ret;
-    }}}};
-
-    _env[">"] = Exp{Exp::ExpType{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
-        if (expList.size() != 2) return {};
         Exp ret;
 
         if (!std::holds_alternative<Number>(std::get<Atom>(expList[0]._v)._v) ||
             !std::holds_alternative<Number>(std::get<Atom>(expList[1]._v)._v))
             return Exp{};
 
-        ret._v = Atom{._v = (std::get<Number>(std::get<Atom>(expList[0]._v)._v) >
-                             std::get<Number>(std::get<Atom>(expList[1]._v)._v))};
+        ret._v = Atom{._v = op(std::get<Number>(std::get<Atom>(expList[0]._v)._v),
+                               std::get<Number>(std::get<Atom>(expList[1]._v)._v))};
         return ret;
+    };
+
+    _env[">"] = Exp{Exp::ExpType{Procedure{[&cmpOperation](std::vector<Exp> expList, Env) -> Exp {
+        return cmpOperation(expList, [](const Number& f, const Number& s) { return f > s; });
     }}}};
 
-    _env[">="] = Exp{Exp::ExpType{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
-        if (expList.size() != 2) return {};
-        Exp ret;
-
-        if (!std::holds_alternative<Number>(std::get<Atom>(expList[0]._v)._v) ||
-            !std::holds_alternative<Number>(std::get<Atom>(expList[1]._v)._v))
-            return Exp{};
-
-        ret._v = Atom{._v = (std::get<Number>(std::get<Atom>(expList[0]._v)._v) >=
-                             std::get<Number>(std::get<Atom>(expList[1]._v)._v))};
-        return ret;
+    _env[">="] = Exp{Exp::ExpType{Procedure{[&cmpOperation](std::vector<Exp> expList, Env) -> Exp {
+        return cmpOperation(expList, [](const Number& f, const Number& s) { return f >= s; });
     }}}};
 
-    _env["<"] = Exp{Exp::ExpType{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
-        if (expList.size() != 2) return {};
-        Exp ret;
-
-        if (!std::holds_alternative<Number>(std::get<Atom>(expList[0]._v)._v) ||
-            !std::holds_alternative<Number>(std::get<Atom>(expList[1]._v)._v))
-            return Exp{};
-
-        ret._v = Atom{._v = (std::get<Number>(std::get<Atom>(expList[0]._v)._v) <
-                             std::get<Number>(std::get<Atom>(expList[1]._v)._v))};
-        return ret;
+    _env["<"] = Exp{Exp::ExpType{Procedure{[&cmpOperation](std::vector<Exp> expList, Env) -> Exp {
+        return cmpOperation(expList, [](const Number& f, const Number& s) { return f < s; });
     }}}};
 
-    _env["<="] = Exp{Exp::ExpType{Procedure{[](std::vector<Exp> expList, Env) -> Exp {
-        if (expList.size() != 2) return {};
-        Exp ret;
-
-        if (!std::holds_alternative<Number>(std::get<Atom>(expList[0]._v)._v) ||
-            !std::holds_alternative<Number>(std::get<Atom>(expList[1]._v)._v))
-            return Exp{};
-
-        ret._v = Atom{._v = (std::get<Number>(std::get<Atom>(expList[0]._v)._v) <=
-                             std::get<Number>(std::get<Atom>(expList[1]._v)._v))};
-        return ret;
+    _env["<="] = Exp{Exp::ExpType{Procedure{[&cmpOperation](std::vector<Exp> expList, Env) -> Exp {
+        return cmpOperation(expList, [](const Number& f, const Number& s) { return f <= s; });
     }}}};
 
-    _env["="] = Exp{Exp::ExpType{Procedure{[this](std::vector<Exp> expList, Env) -> Exp {
-        if (expList.size() != 2) return {};
-        Exp ret;
-        if (!std::holds_alternative<Number>(std::get<Atom>(expList[0]._v)._v) ||
-            !std::holds_alternative<Number>(std::get<Atom>(expList[1]._v)._v))
-            return Exp{};
-
-        Number cond = std::get<Number>(std::get<Atom>(expList[0]._v)._v) ==
-                      std::get<Number>(std::get<Atom>(expList[1]._v)._v);
-        ret._v = Atom{._v = cond};
-        return ret;
+    _env["="] = Exp{Exp::ExpType{Procedure{[&cmpOperation](std::vector<Exp> expList, Env) -> Exp {
+        return cmpOperation(expList, [](const Number& f, const Number& s) { return f == s; });
     }}}};
 
     _env["abs"] = Exp{Exp::ExpType{Procedure{[](std::vector<Exp> expList, Env) -> Exp {

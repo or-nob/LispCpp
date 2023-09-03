@@ -23,11 +23,11 @@ struct Number {
     Number operator*(const Number& o);
     Number operator/(const Number& o);
 
-    Number operator>(const Number& o);
-    Number operator>=(const Number& o);
-    Number operator<(const Number& o);
-    Number operator<=(const Number& o);
-    Number operator==(const Number& o);
+    Number operator>(const Number& o) const;
+    Number operator>=(const Number& o) const;
+    Number operator<(const Number& o) const;
+    Number operator<=(const Number& o) const;
+    Number operator==(const Number& o) const;
 
     static Number abs(const Number& o);
 };
