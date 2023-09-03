@@ -51,11 +51,10 @@ void Env::init() {
         return ret;
     };
 
-    Procedure add = [&arithmaticOperation](std::vector<Exp> expList, Env) -> Exp {
-        return arithmaticOperation(expList, [](Number& acc, Number& elem) { acc += elem; });
-    };
-
-    _env["+"] = Exp{Exp::ExpType{add}};
+    _env["+"] =
+        Exp{Exp::ExpType{Procedure{[&arithmaticOperation](std::vector<Exp> expList, Env) -> Exp {
+            return arithmaticOperation(expList, [](Number& acc, Number& elem) { acc += elem; });
+        }}}};
 
     _env["-"] =
         Exp{Exp::ExpType{Procedure{[&arithmaticOperation](std::vector<Exp> expList, Env) -> Exp {
